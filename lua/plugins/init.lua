@@ -13,6 +13,210 @@ return {
     end,
   },
 
+  {
+    "github/copilot.vim",
+    cmd = "Copilot",
+    event = "InsertEnter",
+    config = function()
+      -- Disable default tab mapping
+      vim.g.copilot_no_tab_map = true
+      vim.g.copilot_assume_mapped = true
+      vim.g.copilot_tab_fallback = ""
+
+      -- Custom mappings
+      vim.keymap.set('i', '<C-j>', 'copilot#Accept("<CR>")', {
+        expr = true,
+        replace_keycodes = false
+      })
+      vim.keymap.set('i', '<C-]>', '<Plug>(copilot-next)')
+      vim.keymap.set('i', '<C-[>', '<Plug>(copilot-previous)')
+      vim.keymap.set('i', '<C-\\>', '<Plug>(copilot-dismiss)')
+    end,
+  },
+
+  {
+    "dccsillag/magma-nvim",
+    build = ":UpdateRemotePlugins",
+    config = function()
+      -- Magma configuration
+      vim.g.magma_automatically_open_output = false
+      vim.g.magma_image_provider = "ueberzug"
+      
+      -- Key mappings for Magma
+      vim.keymap.set('n', '<leader>mi', ':MagmaInit<CR>', { desc = "Initialize Magma" })
+      vim.keymap.set('n', '<leader>me', ':MagmaEvaluateOperator<CR>', { desc = "Evaluate operator" })
+      vim.keymap.set('n', '<leader>ml', ':MagmaEvaluateLine<CR>', { desc = "Evaluate line" })
+      vim.keymap.set('x', '<leader>mv', ':<C-u>MagmaEvaluateVisual<CR>', { desc = "Evaluate visual" })
+      vim.keymap.set('n', '<leader>mc', ':MagmaReevaluateCell<CR>', { desc = "Re-evaluate cell" })
+      vim.keymap.set('n', '<leader>md', ':MagmaDelete<CR>', { desc = "Delete cell" })
+      vim.keymap.set('n', '<leader>mo', ':MagmaShowOutput<CR>', { desc = "Show output" })
+    end,
+  },
+
+  -- {
+  --   "CopilotC-Nvim/CopilotChat.nvim",
+  --   cmd = "CopilotChat",
+  --   branch = "main",
+  --   dependencies = {
+  --     { "github/copilot.vim" },
+  --     { "nvim-lua/plenary.nvim" },
+  --   },
+  --   config = function()
+  --     require("CopilotChat").setup({
+  --       debug = true,
+  --     })
+      
+  --     -- Key mappings for Copilot Chat
+  --     vim.keymap.set('n', '<leader>cc', ':CopilotChat<CR>', { desc = "Open Copilot Chat" })
+  --     vim.keymap.set('v', '<leader>ce', ':CopilotChatExplain<CR>', { desc = "Explain selection" })
+  --     vim.keymap.set('v', '<leader>cf', ':CopilotChatFix<CR>', { desc = "Fix selection" })
+  --     vim.keymap.set('v', '<leader>co', ':CopilotChatOptimize<CR>', { desc = "Optimize selection" })
+  --   end,
+  -- },
+
+  -- Rust: LSP, inline hints, runnables, built-in DAP support (uses codelldb)
+  {
+    "mrcjkb/rustaceanvim",
+    version = "^6",
+    ft = { "rust" },
+    config = function()
+      local nvlsp = require "nvchad.configs.lspconfig"
+      vim.g.rustaceanvim = {
+        server = {
+          on_attach = nvlsp.on_attach,
+          on_init = nvlsp.on_init,
+          capabilities = nvlsp.capabilities,
+          default_settings = {
+            ["rust-analyzer"] = {
+              cargo = { allFeatures = true },
+              checkOnSave = true,
+              check = { command = "clippy" },
+            },
+          },
+        },
+      }
+    end,
+  },
+
+  -- DAP: VSCode-style breakpoints/step-through for Python, Rust, C++
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      "rcarriga/nvim-dap-ui",
+      "nvim-neotest/nvim-nio",
+      "mfussenegger/nvim-dap-python",
+      "jay-babu/mason-nvim-dap.nvim",
+    },
+    config = function()
+      require "configs.dap"
+    end,
+  },
+
+  -- Git: lazygit popup + VSCode-style diff view
+  {
+    "kdheepak/lazygit.nvim",
+    cmd = { "LazyGit" },
+    keys = {
+      { "<leader>gg", "<cmd>LazyGit<cr>", desc = "Open LazyGit" },
+    },
+  },
+  {
+    "sindrets/diffview.nvim",
+    cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+    keys = {
+      { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Diffview: open" },
+      { "<leader>gh", "<cmd>DiffviewFileHistory<cr>", desc = "Diffview: file history" },
+    },
+  },
+
+  -- Problems panel (like VSCode's Problems tab)
+  {
+    "folke/trouble.nvim",
+    cmd = "Trouble",
+    keys = {
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (workspace)" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Diagnostics (buffer)" },
+      { "<leader>xs", "<cmd>Trouble symbols toggle<cr>", desc = "Symbols" },
+    },
+    opts = {},
+  },
+
+  -- Test runner panel (like VSCode's Testing tab)
+  {
+    "nvim-neotest/neotest",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-neotest/nvim-nio",
+      "antoinemadec/FixCursorHold.nvim",
+      "nvim-neotest/neotest-python",
+      "rouge8/neotest-rust",
+    },
+    keys = {
+      { "<leader>tt", function() require("neotest").run.run() end, desc = "Test: run nearest" },
+      { "<leader>tf", function() require("neotest").run.run(vim.fn.expand "%") end, desc = "Test: run file" },
+      { "<leader>to", function() require("neotest").output.open { enter = true } end, desc = "Test: output" },
+      { "<leader>ts", function() require("neotest").summary.toggle() end, desc = "Test: summary panel" },
+    },
+    config = function()
+      require("neotest").setup {
+        adapters = {
+          require "neotest-python",
+          require "neotest-rust",
+        },
+      }
+    end,
+  },
+
+  -- Multi-cursor editing (Ctrl+N like VSCode's Ctrl+D)
+  {
+    "mg979/vim-visual-multi",
+    branch = "master",
+    event = "VeryLazy",
+  },
+
+  -- Breadcrumbs (winbar) + symbols outline sidebar (like VSCode)
+  {
+    "SmiteshP/nvim-navic",
+    lazy = true,
+    init = function()
+      vim.g.navic_silence = true
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client and client.supports_method "textDocument/documentSymbol" then
+            require("nvim-navic").attach(client, args.buf)
+            vim.wo.winbar = "%{%v:lua.require'nvim-navic'.get_location()%}"
+          end
+        end,
+      })
+    end,
+    opts = { highlight = true },
+  },
+  {
+    "hedyhli/outline.nvim",
+    cmd = "Outline",
+    keys = {
+      { "<leader>o", "<cmd>Outline<cr>", desc = "Toggle symbols outline" },
+    },
+    opts = {},
+  },
+
+  -- Markdown live preview in browser
+  {
+    "iamcco/markdown-preview.nvim",
+    ft = { "markdown" },
+    build = function()
+      vim.fn["mkdp#util#install"]()
+    end,
+    init = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+    end,
+    keys = {
+      { "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", desc = "Markdown preview toggle" },
+    },
+  },
+
   -- test new blink
   -- { import = "nvchad.blink.lazyspec" },
 

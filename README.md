@@ -1,9 +1,7 @@
-**This repo is supposed to used as config by NvChad users!**
+# matty_nvim
 
-- The main nvchad repo (NvChad/NvChad) is used as a plugin by this repo.
-- So you just import its modules , like `require "nvchad.options" , require "nvchad.mappings"`
-- So you can delete the .git from this repo ( when you clone it locally ) or fork it :)
+My personal NvChad config, tuned to feel close to VSCode for Python, Rust, C++, and Markdown work — LSP, debugging (breakpoints/step-through), git panel, problems panel, test runner, multi-cursor, breadcrumbs/outline, and markdown preview.
 
-# Credits
+See [SETUP.md](./SETUP.md) for how to install this on a new machine.
 
-1) Lazyvim starter https://github.com/LazyVim/starter as nvchad's starter was inspired by Lazyvim's . It made a lot of things easier!
+Built on top of [NvChad/starter](https://github.com/NvChad/starter), which in turn was inspired by [LazyVim/starter](https://github.com/LazyVim/starter).
