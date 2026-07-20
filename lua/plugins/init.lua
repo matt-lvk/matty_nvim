@@ -69,23 +69,59 @@ return {
     end,
   },
 
+  -- Notebook (.ipynb) support: jupytext converts ipynb <-> plain text
+  -- transparently on read/write; molten executes cells against a real
+  -- Jupyter kernel and renders output (incl. images) inline via WezTerm.
   {
-    "dccsillag/magma-nvim",
+    "GCBallesteros/jupytext.nvim",
+    lazy = false,
+    opts = {
+      style = "hydrogen",
+      output_extension = "auto",
+      force_ft = nil,
+    },
+  },
+
+  {
+    "benlubas/molten-nvim",
+    version = "^1.9.2",
+    dependencies = { "willothy/wezterm.nvim" },
     build = ":UpdateRemotePlugins",
-    config = function()
-      -- Magma configuration
-      vim.g.magma_automatically_open_output = false
-      vim.g.magma_image_provider = "ueberzug"
-      
-      -- Key mappings for Magma
-      vim.keymap.set('n', '<leader>mi', ':MagmaInit<CR>', { desc = "Initialize Magma" })
-      vim.keymap.set('n', '<leader>me', ':MagmaEvaluateOperator<CR>', { desc = "Evaluate operator" })
-      vim.keymap.set('n', '<leader>ml', ':MagmaEvaluateLine<CR>', { desc = "Evaluate line" })
-      vim.keymap.set('x', '<leader>mv', ':<C-u>MagmaEvaluateVisual<CR>', { desc = "Evaluate visual" })
-      vim.keymap.set('n', '<leader>mc', ':MagmaReevaluateCell<CR>', { desc = "Re-evaluate cell" })
-      vim.keymap.set('n', '<leader>md', ':MagmaDelete<CR>', { desc = "Delete cell" })
-      vim.keymap.set('n', '<leader>mo', ':MagmaShowOutput<CR>', { desc = "Show output" })
+    init = function()
+      vim.g.molten_image_provider = "wezterm"
+      vim.g.molten_auto_open_output = false
+      vim.g.molten_wrap_output = true
+      vim.g.molten_virt_text_output = true
+      vim.g.molten_output_win_max_height = 20
     end,
+    keys = {
+      { "<leader>mi", "<cmd>MoltenInit<cr>", desc = "Molten: init kernel" },
+      { "<leader>me", "<cmd>MoltenEvaluateOperator<cr>", desc = "Molten: evaluate operator" },
+      { "<leader>ml", "<cmd>MoltenEvaluateLine<cr>", desc = "Molten: evaluate line" },
+      { "<leader>mv", ":<C-u>MoltenEvaluateVisual<cr>gv", mode = "v", desc = "Molten: evaluate visual" },
+      {
+        "<leader>mr",
+        function()
+          -- Select and evaluate the "# %%"-delimited cell under the cursor.
+          local start_line = vim.fn.search("^# %%", "bcnW")
+          start_line = (start_line == 0) and 1 or (start_line + 1)
+          local end_line = vim.fn.search("^# %%", "nW")
+          end_line = (end_line == 0) and vim.fn.line "$" or (end_line - 1)
+          vim.api.nvim_win_set_cursor(0, { start_line, 0 })
+          vim.cmd "normal! V"
+          vim.api.nvim_win_set_cursor(0, { end_line, 0 })
+          vim.cmd "MoltenEvaluateVisual"
+        end,
+        desc = "Molten: run current cell",
+      },
+      { "<leader>mc", "<cmd>MoltenReevaluateCell<cr>", desc = "Molten: re-evaluate cell" },
+      { "<leader>md", "<cmd>MoltenDelete<cr>", desc = "Molten: delete cell" },
+      { "<leader>mo", "<cmd>MoltenShowOutput<cr>", desc = "Molten: show output" },
+      { "<leader>mh", "<cmd>MoltenHideOutput<cr>", desc = "Molten: hide output" },
+      { "<leader>mx", "<cmd>MoltenInterrupt<cr>", desc = "Molten: interrupt kernel" },
+      { "]c", "<cmd>MoltenNext<cr>", desc = "Molten: next cell" },
+      { "[c", "<cmd>MoltenPrev<cr>", desc = "Molten: previous cell" },
+    },
   },
 
   -- {
@@ -141,6 +177,11 @@ return {
       "nvim-neotest/nvim-nio",
       "mfussenegger/nvim-dap-python",
       "jay-babu/mason-nvim-dap.nvim",
+    },
+    keys = {
+      "<F5>", "<S-F5>", "<F9>", "<F10>", "<F11>", "<S-F11>",
+      "<leader>db", "<leader>dB", "<leader>du", "<leader>dr",
+      "<leader>dc", "<leader>dt", "<leader>do", "<leader>di", "<leader>dO",
     },
     config = function()
       require "configs.dap"

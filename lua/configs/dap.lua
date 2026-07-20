@@ -73,3 +73,10 @@ map("n", "<leader>dB", function()
 end, { desc = "DAP: Conditional breakpoint" })
 map("n", "<leader>du", dapui.toggle, { desc = "DAP: Toggle UI" })
 map("n", "<leader>dr", dap.repl.toggle, { desc = "DAP: Toggle REPL" })
+
+-- Leader-key equivalents of the F-keys above, for when those aren't reliable
+map("n", "<leader>dc", dap.continue, { desc = "DAP: Continue / Start" })
+map("n", "<leader>dt", dap.terminate, { desc = "DAP: Stop" })
+map("n", "<leader>do", dap.step_over, { desc = "DAP: Step over" })
+map("n", "<leader>di", dap.step_into, { desc = "DAP: Step into" })
+map("n", "<leader>dO", dap.step_out, { desc = "DAP: Step out" })
