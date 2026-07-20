@@ -5,6 +5,19 @@ return {
     opts = require "configs.conform",
   },
 
+  -- Auto-save on insert leave and text changed
+  {
+    "okuuva/auto-save.nvim",
+    event = { "InsertLeave", "TextChanged" },
+    opts = {
+      debounce_delay = 1000,
+      trigger_events = { "InsertLeave", "TextChanged" },
+      condition = function(buf)
+        return vim.b[buf].auto_save ~= false
+      end,
+    },
+  },
+
   -- These are some examples, uncomment them if you want to see them work!
   {
     "neovim/nvim-lspconfig",
@@ -38,6 +51,8 @@ return {
     cmd = "Copilot",
     event = "InsertEnter",
     config = function()
+      -- Enable Copilot
+      vim.g.copilot_enabled = true
       -- Disable default tab mapping
       vim.g.copilot_no_tab_map = true
       vim.g.copilot_assume_mapped = true
@@ -146,6 +161,20 @@ return {
     keys = {
       { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Diffview: open" },
       { "<leader>gh", "<cmd>DiffviewFileHistory<cr>", desc = "Diffview: file history" },
+    },
+  },
+
+  -- Git status panel + commit graph (VSCode-like git tab)
+  {
+    "NeogitOrg/neogit",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = "Neogit",
+    keys = {
+      { "<leader>gs", "<cmd>Neogit kind=floating<CR>", desc = "Git status panel" },
+    },
+    opts = {
+      disable_insert_on_commit = true,
+      integrations = { diffview = true },
     },
   },
 

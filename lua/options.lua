@@ -2,5 +2,8 @@ require "nvchad.options"
 
 -- add yours here!
 
--- local o = vim.o
--- o.cursorlineopt ='both' -- to enable cursorline!
+local o = vim.o
+
+-- Add npm global binaries to PATH
+local npm_global = vim.fn.expand "~/.npm-global/bin"
+vim.env.PATH = npm_global .. ":" .. vim.env.PATH

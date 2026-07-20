@@ -19,7 +19,7 @@ for the icons to render correctly.
 
 ```sh
 # Python
-npm install -g pyright
+npm install -g basedpyright  # LSP with semantic tokens (pyright fork)
 pip3 install debugpy         # Python debugger (nvim-dap-python uses system python3)
 brew install ruff            # formatter/linter
 
@@ -76,14 +76,29 @@ NvChad's default keymaps (`:h NvChad`) still apply.
 | `<leader>tt` / `<leader>tf` | Run nearest test / run file's tests |
 | `<leader>to` / `<leader>ts` | Test output / test summary panel |
 | `<leader>o` | Toggle symbols outline sidebar |
+| `<leader>e` | Toggle Neo-tree file explorer |
+| `<leader>gs` | Open Neogit git status panel |
 | `<leader>mp` | Toggle markdown live preview (opens in browser) |
 | `Ctrl+N` (visual/normal, on a word) | Multi-cursor: select next match (vim-visual-multi) |
+| `jk` (insert/terminal mode) | Exit to normal mode (alternative to `Esc`) |
 
 Breadcrumbs (current function/class path) show automatically in the winbar
 for any file with LSP symbol support.
 
+**Additional features configured:**
+- **Auto-save**: Files auto-save 1 second after changes (InsertLeave/TextChanged)
+- **File explorer**: Neo-tree (`<leader>e`) for VSCode-like file navigation
+- **Git integration**: Neogit (`<leader>gs`) for interactive git status/staging/commits
+- **Theme**: Uses `onedark` theme with custom syntax highlighting optimized for Python
+- **GitHub Copilot**: Enabled with custom keybindings (Ctrl+j accept, Ctrl+] next, Ctrl+[ prev)
+
 ## 5. Notes for future-you
 
+- **basedpyright vs pyright**: This config uses `basedpyright` (a pyright fork) instead of
+  the standard `pyright` because basedpyright enables LSP semantic tokens by default,
+  providing better syntax highlighting. NvChad disables semantic tokens globally, but
+  `lua/configs/lspconfig.lua` re-enables them specifically for basedpyright with a full
+  token legend to avoid errors.
 - `rust-analyzer` ships as a rustup *component*, not a cargo-installed binary —
   `rustup component add rust-analyzer` is required even though `~/.cargo/bin/rust-analyzer`
   may already exist as a shim.
@@ -93,3 +108,6 @@ for any file with LSP symbol support.
 - `pack/github/start/copilot.vim` (native Vim packpath) is gitignored — it's a separate,
   possibly-redundant install from the `copilot.vim` already managed by lazy.nvim in
   `lua/plugins/init.lua`. Worth pruning one of the two eventually.
+- **npm global prefix**: If npm global binaries aren't in your PATH, this config adds
+  `~/.npm-global/bin` to nvim's PATH in `lua/options.lua`. Install npm packages with
+  `npm install -g --prefix ~/.npm-global <package>` or set `npm config set prefix ~/.npm-global`.
