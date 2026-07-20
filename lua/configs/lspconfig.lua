@@ -26,4 +26,18 @@ vim.lsp.config("pyright", {
 })
 vim.lsp.enable "pyright"
 
+-- Ruff LSP: live lint diagnostics (unused imports, undefined vars, etc.)
+-- Formatting is handled by conform.nvim (ruff_format) instead
+vim.lsp.config("ruff", {
+  cmd = { "ruff", "server" },
+  filetypes = { "python" },
+  settings = {
+    ruff = {
+      lint = { enable = true },
+      format = { enable = false },
+    },
+  },
+})
+vim.lsp.enable "ruff"
+
 -- read :h vim.lsp.config for changing options of lsp servers
