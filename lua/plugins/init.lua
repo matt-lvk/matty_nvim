@@ -5,19 +5,6 @@ return {
     opts = require "configs.conform",
   },
 
-  -- Auto-save on insert leave and text changed
-  {
-    "okuuva/auto-save.nvim",
-    event = { "InsertLeave", "TextChanged" },
-    opts = {
-      debounce_delay = 1000,
-      trigger_events = { "InsertLeave", "TextChanged" },
-      condition = function(buf)
-        return vim.b[buf].auto_save ~= false
-      end,
-    },
-  },
-
   -- These are some examples, uncomment them if you want to see them work!
   {
     "neovim/nvim-lspconfig",
@@ -39,9 +26,16 @@ return {
       { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Toggle file explorer" },
     },
     opts = {
+      window = {
+        width = 30,
+      },
       filesystem = {
         follow_current_file = { enabled = true },
         hijack_netrw_behavior = "open_current",
+        filtered_items = {
+          hide_dotfiles = false,
+          hide_gitignored = false,
+        },
       },
     },
   },
@@ -66,83 +60,74 @@ return {
       vim.keymap.set('i', '<C-]>', '<Plug>(copilot-next)')
       vim.keymap.set('i', '<C-[>', '<Plug>(copilot-previous)')
       vim.keymap.set('i', '<C-\\>', '<Plug>(copilot-dismiss)')
+      vim.keymap.set('i', '<M-l>', '<Plug>(copilot-accept-line)')
     end,
   },
 
-  -- Notebook (.ipynb) support: jupytext converts ipynb <-> plain text
-  -- transparently on read/write; molten executes cells against a real
-  -- Jupyter kernel and renders output (incl. images) inline via WezTerm.
   {
-    "GCBallesteros/jupytext.nvim",
-    lazy = false,
-    opts = {
-      style = "hydrogen",
-      output_extension = "auto",
-      force_ft = nil,
-    },
-  },
-
-  {
-    "benlubas/molten-nvim",
-    version = "^1.9.2",
-    dependencies = { "willothy/wezterm.nvim" },
+    "dccsillag/magma-nvim",
     build = ":UpdateRemotePlugins",
-    init = function()
-      vim.g.molten_image_provider = "wezterm"
-      vim.g.molten_auto_open_output = false
-      vim.g.molten_wrap_output = true
-      vim.g.molten_virt_text_output = true
-      vim.g.molten_output_win_max_height = 20
+    config = function()
+      -- Magma configuration
+      vim.g.magma_automatically_open_output = false
+      vim.g.magma_image_provider = "ueberzug"
+      
+      -- Key mappings for Magma
+      vim.keymap.set('n', '<leader>mi', ':MagmaInit<CR>', { desc = "Initialize Magma" })
+      vim.keymap.set('n', '<leader>me', ':MagmaEvaluateOperator<CR>', { desc = "Evaluate operator" })
+      vim.keymap.set('n', '<leader>ml', ':MagmaEvaluateLine<CR>', { desc = "Evaluate line" })
+      vim.keymap.set('x', '<leader>mv', ':<C-u>MagmaEvaluateVisual<CR>', { desc = "Evaluate visual" })
+      vim.keymap.set('n', '<leader>mc', ':MagmaReevaluateCell<CR>', { desc = "Re-evaluate cell" })
+      vim.keymap.set('n', '<leader>md', ':MagmaDelete<CR>', { desc = "Delete cell" })
+      vim.keymap.set('n', '<leader>mo', ':MagmaShowOutput<CR>', { desc = "Show output" })
     end,
-    keys = {
-      { "<leader>mi", "<cmd>MoltenInit<cr>", desc = "Molten: init kernel" },
-      { "<leader>me", "<cmd>MoltenEvaluateOperator<cr>", desc = "Molten: evaluate operator" },
-      { "<leader>ml", "<cmd>MoltenEvaluateLine<cr>", desc = "Molten: evaluate line" },
-      { "<leader>mv", ":<C-u>MoltenEvaluateVisual<cr>gv", mode = "v", desc = "Molten: evaluate visual" },
-      {
-        "<leader>mr",
-        function()
-          -- Select and evaluate the "# %%"-delimited cell under the cursor.
-          local start_line = vim.fn.search("^# %%", "bcnW")
-          start_line = (start_line == 0) and 1 or (start_line + 1)
-          local end_line = vim.fn.search("^# %%", "nW")
-          end_line = (end_line == 0) and vim.fn.line "$" or (end_line - 1)
-          vim.api.nvim_win_set_cursor(0, { start_line, 0 })
-          vim.cmd "normal! V"
-          vim.api.nvim_win_set_cursor(0, { end_line, 0 })
-          vim.cmd "MoltenEvaluateVisual"
-        end,
-        desc = "Molten: run current cell",
-      },
-      { "<leader>mc", "<cmd>MoltenReevaluateCell<cr>", desc = "Molten: re-evaluate cell" },
-      { "<leader>md", "<cmd>MoltenDelete<cr>", desc = "Molten: delete cell" },
-      { "<leader>mo", "<cmd>MoltenShowOutput<cr>", desc = "Molten: show output" },
-      { "<leader>mh", "<cmd>MoltenHideOutput<cr>", desc = "Molten: hide output" },
-      { "<leader>mx", "<cmd>MoltenInterrupt<cr>", desc = "Molten: interrupt kernel" },
-      { "]c", "<cmd>MoltenNext<cr>", desc = "Molten: next cell" },
-      { "[c", "<cmd>MoltenPrev<cr>", desc = "Molten: previous cell" },
-    },
   },
 
   -- {
   --   "CopilotC-Nvim/CopilotChat.nvim",
-  --   cmd = "CopilotChat",
-  --   branch = "main",
+  --   branch = "canary",
   --   dependencies = {
   --     { "github/copilot.vim" },
   --     { "nvim-lua/plenary.nvim" },
   --   },
-  --   config = function()
-  --     require("CopilotChat").setup({
-  --       debug = true,
-  --     })
-      
-  --     -- Key mappings for Copilot Chat
-  --     vim.keymap.set('n', '<leader>cc', ':CopilotChat<CR>', { desc = "Open Copilot Chat" })
-  --     vim.keymap.set('v', '<leader>ce', ':CopilotChatExplain<CR>', { desc = "Explain selection" })
-  --     vim.keymap.set('v', '<leader>cf', ':CopilotChatFix<CR>', { desc = "Fix selection" })
-  --     vim.keymap.set('v', '<leader>co', ':CopilotChatOptimize<CR>', { desc = "Optimize selection" })
-  --   end,
+  --   cmd = {
+  --     "CopilotChat",
+  --     "CopilotChatOpen",
+  --     "CopilotChatClose",
+  --     "CopilotChatToggle",
+  --     "CopilotChatReset",
+  --     "CopilotChatExplain",
+  --     "CopilotChatReview",
+  --     "CopilotChatFix",
+  --     "CopilotChatOptimize",
+  --     "CopilotChatDocs",
+  --     "CopilotChatTests",
+  --     "CopilotChatFixDiagnostic",
+  --     "CopilotChatCommit",
+  --     "CopilotChatCommitStaged",
+  --   },
+  --   keys = {
+  --     { "<leader>cc", "<cmd>CopilotChatToggle<CR>", desc = "Toggle Copilot Chat", mode = { "n", "v" } },
+  --     { "<leader>ce", "<cmd>CopilotChatExplain<CR>", desc = "Explain code", mode = "v" },
+  --     { "<leader>ct", "<cmd>CopilotChatTests<CR>", desc = "Generate tests", mode = "v" },
+  --     { "<leader>cf", "<cmd>CopilotChatFix<CR>", desc = "Fix code", mode = "v" },
+  --     { "<leader>co", "<cmd>CopilotChatOptimize<CR>", desc = "Optimize code", mode = "v" },
+  --     { "<leader>cd", "<cmd>CopilotChatDocs<CR>", desc = "Generate docs", mode = "v" },
+  --     { "<leader>cr", "<cmd>CopilotChatReview<CR>", desc = "Review code", mode = "v" },
+  --     { "<leader>cq", function()
+  --       local input = vim.fn.input("Quick Chat: ")
+  --       if input ~= "" then
+  --         require("CopilotChat").ask(input, { selection = require("CopilotChat.select").buffer })
+  --       end
+  --     end, desc = "Quick chat", mode = "n" },
+  --   },
+  --   opts = {
+  --     debug = false,
+  --     window = {
+  --       layout = 'vertical',
+  --       width = 0.4,
+  --     },
+  --   },
   -- },
 
   -- Rust: LSP, inline hints, runnables, built-in DAP support (uses codelldb)
@@ -177,11 +162,6 @@ return {
       "nvim-neotest/nvim-nio",
       "mfussenegger/nvim-dap-python",
       "jay-babu/mason-nvim-dap.nvim",
-    },
-    keys = {
-      "<F5>", "<S-F5>", "<F9>", "<F10>", "<F11>", "<S-F11>",
-      "<leader>db", "<leader>dB", "<leader>du", "<leader>dr",
-      "<leader>dc", "<leader>dt", "<leader>do", "<leader>di", "<leader>dO",
     },
     config = function()
       require "configs.dap"
@@ -305,6 +285,20 @@ return {
     keys = {
       { "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", desc = "Markdown preview toggle" },
     },
+  },
+
+  {
+    "nvim-telescope/telescope.nvim",
+    opts = function(_, opts)
+      opts.pickers = opts.pickers or {}
+      opts.pickers.find_files = {
+        hidden = true,
+        no_ignore = true,
+      }
+      opts.pickers.live_grep = {
+        additional_args = { "--no-ignore", "--hidden" },
+      }
+    end,
   },
 
   -- test new blink

@@ -66,9 +66,6 @@ NvChad's default keymaps (`:h NvChad`) still apply.
 | `F10` / `F11` | Debug: step over / step into |
 | `Shift+F11` | Debug: step out |
 | `<leader>db` / `<leader>dB` | Toggle breakpoint / conditional breakpoint |
-| `<leader>dc` / `<leader>dt` | Debug: continue-start / stop (leader equivalents of `F5`/`Shift+F5`) |
-| `<leader>do` / `<leader>di` | Debug: step over / step into (leader equivalents of `F10`/`F11`) |
-| `<leader>dO` | Debug: step out (leader equivalent of `Shift+F11`) |
 | `<leader>du` | Toggle debug UI (variables/watch/stacks) |
 | `<leader>dr` | Toggle debug REPL |
 | `<leader>gg` | LazyGit popup |
@@ -95,43 +92,7 @@ for any file with LSP symbol support.
 - **Theme**: Uses `onedark` theme with custom syntax highlighting optimized for Python
 - **GitHub Copilot**: Enabled with custom keybindings (Ctrl+j accept, Ctrl+] next, Ctrl+[ prev)
 
-## 5. Debugging
-
-Step-through debugging (breakpoints, stepping, variable inspection) works via
-`nvim-dap` + `nvim-dap-ui`, VSCode-style. Covers Python (`.py` files, via
-`debugpy`) and Rust/C/C++ (via `codelldb`). It does **not** cover stepping
-through code running inside a Jupyter kernel (Molten) — that's a separate,
-unrelated execution path; see the notebook section above for cell execution.
-
-Every action below has both an F-key and a `<leader>d`-prefixed equivalent —
-use whichever is reliable on your keyboard.
-
-1. Open the file you want to debug, put your cursor on the line to stop at,
-   press `F9` (or `<leader>db`) to toggle a breakpoint. A `●` sign appears in
-   the gutter.
-2. Press `F5` (or `<leader>dc`) to start. You'll get a prompt to pick a
-   launch config:
-   - **Python**: "Launch file" runs the current file under `debugpy`.
-   - **Rust/C/C++**: prompts for a path to the compiled executable to launch
-     under `codelldb`.
-3. Execution stops at your breakpoint. The `dapui` panel opens automatically
-   (variables, call stack, breakpoints, watches).
-4. Step through with `F10`/`<leader>do` (step over), `F11`/`<leader>di` (step
-   into), `Shift+F11`/`<leader>dO` (step out). `F5`/`<leader>dc` again
-   continues to the next breakpoint.
-5. `<leader>dr` opens a REPL scoped to the current paused frame — evaluate
-   expressions, inspect/mutate variables live.
-6. `<leader>dB` sets a conditional breakpoint (prompts for an expression;
-   execution only stops there if it evaluates truthy).
-7. `Shift+F5` (or `<leader>dt`) stops the session. `<leader>du` toggles the
-   `dapui` panel manually if you want it out of the way without stopping.
-
-Requires `debugpy` installed for whichever `python3` resolves on `PATH` at
-Neovim startup (see prerequisites above) — `nvim-dap-python` is configured to
-use `vim.fn.exepath "python3"`, so if you have multiple Python installs, the
-one earliest on `PATH` is the one that needs `debugpy`.
-
-## 6. Notes for future-you
+## 5. Notes for future-you
 
 - **basedpyright vs pyright**: This config uses `basedpyright` (a pyright fork) instead of
   the standard `pyright` because basedpyright enables LSP semantic tokens by default,
