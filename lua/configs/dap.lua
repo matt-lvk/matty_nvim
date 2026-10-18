@@ -8,8 +8,21 @@ require("mason-nvim-dap").setup {
   handlers = {},
 }
 
--- Python: use the system python3 that already has debugpy installed
-require("dap-python").setup(vim.fn.exepath "python3")
+-- Python: debugpy runs from the nvim venv (see options.lua); fall back to system python3
+local dap_python = require "dap-python"
+local nvim_py = vim.fn.stdpath "data" .. "/py/bin/python"
+dap_python.setup(vim.fn.executable(nvim_py) == 1 and nvim_py or vim.fn.exepath "python3")
+-- The program being debugged runs with the project's venv if any, else system python3
+-- ($VIRTUAL_ENV / $CONDA_PREFIX are still checked first by dap-python)
+dap_python.resolve_python = function()
+  for _, dir in ipairs { "venv", ".venv", "env", ".env" } do
+    local py = vim.fn.getcwd() .. "/" .. dir .. "/bin/python"
+    if vim.fn.executable(py) == 1 then
+      return py
+    end
+  end
+  return vim.fn.exepath "python3"
+end
 
 -- codelldb adapter, shared by C, C++ and Rust
 local mason_pkgs = vim.fn.stdpath "data" .. "/mason/packages"

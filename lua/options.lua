@@ -8,6 +8,15 @@ local o = vim.o
 local npm_global = vim.fn.expand "~/.npm-global/bin"
 vim.env.PATH = npm_global .. ":" .. vim.env.PATH
 
+-- Python provider (pynvim) lives in a dedicated venv, so it works with
+-- Homebrew's externally-managed python. Create it with:
+--   python3 -m venv ~/.local/share/nvim/py && ~/.local/share/nvim/py/bin/pip install pynvim debugpy
+local nvim_py = vim.fn.stdpath "data" .. "/py/bin/python"
+if vim.fn.executable(nvim_py) == 1 then
+  vim.g.python3_host_prog = nvim_py
+  vim.g.loaded_python3_provider = nil -- NvChad disables it; magma/molten need it
+end
+
 -- Set terminal title to "nvim | <repo-name>"
 o.title = true
 o.titlestring = "nvim | " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t")

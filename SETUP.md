@@ -20,7 +20,10 @@ for the icons to render correctly.
 ```sh
 # Python
 npm install -g basedpyright  # LSP with semantic tokens (pyright fork)
-pip3 install debugpy         # Python debugger (nvim-dap-python uses system python3)
+# pynvim (python provider) + debugpy (debugger) go in a dedicated venv —
+# Homebrew python refuses global pip installs (PEP 668). options.lua/dap.lua use it.
+python3 -m venv ~/.local/share/nvim/py
+~/.local/share/nvim/py/bin/pip install pynvim debugpy
 brew install ruff            # formatter/linter
 
 # Rust
